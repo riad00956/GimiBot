@@ -13,16 +13,18 @@ const PORT = process.env.PORT || 3000;
 const bot = new Telegraf(BOT_TOKEN);
 
 // File paths
-const packagesFilePath = path.join(__dirname, 'packages.json');
+const plansFilePath = path.join(__dirname, 'plans.json');       // All diamond-related plans/packages
 const ordersFilePath = path.join(__dirname, 'orders.json');
+// Note: packages.json is not explicitly loaded here as per your request,
+//       it's kept separate for future potential use.
 
-// Load packages
-let packages = {};
+// Load plans
+let allProducts = {}; // To store all plans
 try {
-    packages = JSON.parse(fs.readFileSync(packagesFilePath, 'utf8'));
+    allProducts = JSON.parse(fs.readFileSync(plansFilePath, 'utf8'));
 } catch (error) {
-    console.error('Error loading packages.json:', error);
-    packages = {}; // Fallback to empty object if file is not found or invalid
+    console.error('Error loading plans.json:', error);
+    allProducts = {}; // Fallback to empty object if file is not found or invalid
 }
 
 // Ensure orders.json exists
@@ -31,20 +33,20 @@ if (!fs.existsSync(ordersFilePath)) {
 }
 
 // Temporary storage for user input (for multi-step processes)
-const userSessions = {}; // { userId: { step: 'waiting_for_uid' | 'waiting_for_payment_details', packageCode: 'FX1', uid: '...', transactionId: '...', screenshotId: '...' } }
+const userSessions = {}; // { userId: { step: 'waiting_for_uid' | 'waiting_for_payment_details', productCode: 'FX1', uid: '...', transactionId: '...', screenshotId: '...' } }
 
 // --- Helper Functions ---
 
-function getPackagesList() {
-    let message = "আমাদের ডায়মন্ড প্যাকেজগুলো নিচে দেওয়া হলো:\n\n";
-    for (const category in packages) {
+function getPlansList() { // Renamed from getPackagesList for clarity
+    let message = "আমাদের ডায়মন্ড প্ল্যানগুলো নিচে দেওয়া হলো:\n\n";
+    for (const category in allProducts) { // Iterate through all plans
         message += `⭐ ${category} 📦\n`;
-        packages[category].forEach(pkg => {
-            message += `• ${pkg.code} - ${pkg.name} = ${pkg.price}৳\n`;
+        allProducts[category].forEach(product => {
+            message += `• ${product.code} - ${product.name} = ${product.price}৳\n`;
         });
         message += "\n";
     }
-    message += "আপনার পছন্দের প্যাকেজের কোড টাইপ করে পাঠান।";
+    message += "আপনার পছন্দের প্ল্যানের কোড টাইপ করে পাঠান।";
     return message;
 }
 
@@ -61,12 +63,12 @@ bot.start(async (ctx) => {
         `স্বাগতম, ${ctx.from.first_name}!\n\n` +
         `আমরা আপনার Free Fire আইডি-তে ম্যানুয়ালি ডায়মন্ড টপ-আপ করে থাকি।\n\n` +
         `আমাদের সার্ভিস ব্যবহার করার নিয়মাবলী:\n` +
-        `১. "Buy Now" বাটনে ক্লিক করে প্যাকেজ লিস্ট দেখুন।\n` +
-        `২. আপনার পছন্দের প্যাকেজ কোড টাইপ করে পাঠান।\n` +
+        `১. "Buy Now" বাটনে ক্লিক করে প্ল্যান লিস্ট দেখুন।\n` +
+        `২. আপনার পছন্দের প্ল্যান কোড টাইপ করে পাঠান।\n` +
         `৩. আপনার Free Fire UID দিন।\n` +
         `৪. পেমেন্ট সম্পন্ন করে ট্রান্সেকশন আইডি এবং পেমেন্টের স্ক্রিনশট দিন।\n` +
         `৫. আপনার অর্ডারটি অ্যাডমিন দ্বারা নিশ্চিত হওয়ার পর ডায়মন্ড পাঠিয়ে দেওয়া হবে।\n\n` +
-        `যেকোনো প্রশ্ন থাকলে `/ask আপনার প্রশ্ন` লিখে জিজ্ঞাসা করতে পারেন।`,
+        `যেকোনো প্রশ্ন থাকলে \`/ask আপনার প্রশ্ন\` লিখে জিজ্ঞাসা করতে পারেন।`,
         Markup.inlineKeyboard([
             Markup.button.callback('Buy Now', 'buy_now')
         ])
@@ -74,10 +76,10 @@ bot.start(async (ctx) => {
 });
 
 bot.action('buy_now', async (ctx) => {
-    await ctx.editMessageText(getPackagesList());
+    await ctx.editMessageText(getPlansList()); // Changed to getPlansList
 });
 
-// Handling package code input
+// Handling plan code input
 bot.on('text', async (ctx) => {
     const userId = ctx.from.id;
     const text = ctx.message.text;
@@ -133,24 +135,24 @@ bot.on('text', async (ctx) => {
         return; // Exit after handling session steps
     }
 
-    // Check if the text is a valid package code
-    let selectedPackage = null;
-    for (const category in packages) {
-        selectedPackage = packages[category].find(pkg => pkg.code.toUpperCase() === text.toUpperCase());
-        if (selectedPackage) break;
+    // Check if the text is a valid product code (from plans)
+    let selectedProduct = null;
+    for (const category in allProducts) { // Search only in allProducts (loaded from plans.json)
+        selectedProduct = allProducts[category].find(product => product.code.toUpperCase() === text.toUpperCase());
+        if (selectedProduct) break;
     }
 
-    if (selectedPackage) {
+    if (selectedProduct) {
         userSessions[userId] = {
             step: 'waiting_for_uid',
-            packageCode: selectedPackage.code,
-            packageName: selectedPackage.name,
-            packagePrice: selectedPackage.price,
+            productCode: selectedProduct.code,
+            productName: selectedProduct.name,
+            productPrice: selectedProduct.price,
             timestamp: new Date().toISOString()
         };
-        await ctx.reply(`আপনি "${selectedPackage.name}" (${selectedPackage.price}৳) সিলেক্ট করেছেন।\n\nএবার আপনার Free Fire Player ID (UID) দিন:`);
+        await ctx.reply(`আপনি "${selectedProduct.name}" (${selectedProduct.price}৳) সিলেক্ট করেছেন।\n\nএবার আপনার Free Fire Player ID (UID) দিন:`);
     } else {
-        await ctx.reply('দুঃখিত, আপনি ভুল প্যাকেজ কোড দিয়েছেন অথবা আপনার ইনপুটটি বোঝা যাচ্ছে না। অনুগ্রহ করে সঠিক প্যাকেজ কোড দিন অথবা `/start` টাইপ করে শুরু করুন।');
+        await ctx.reply('দুঃখিত, আপনি ভুল প্ল্যান কোড দিয়েছেন অথবা আপনার ইনপুটটি বোঝা যাচ্ছে না। অনুগ্রহ করে সঠিক কোড দিন অথবা `/start` টাইপ করে শুরু করুন।');
     }
 });
 
@@ -161,15 +163,15 @@ bot.on('photo', async (ctx) => {
         const fileId = ctx.message.photo[ctx.message.photo.length - 1].file_id;
         userSessions[userId].screenshotId = fileId;
 
-        const { packageCode, packageName, packagePrice, uid, transactionId, screenshotId, timestamp } = userSessions[userId];
+        const { productCode, productName, productPrice, uid, transactionId, screenshotId, timestamp } = userSessions[userId];
 
         const order = {
             orderId: Date.now().toString(), // Simple unique ID
             userId: userId,
             userName: ctx.from.first_name + (ctx.from.last_name ? ' ' + ctx.from.last_name : ''),
-            packageCode,
-            packageName,
-            packagePrice,
+            productCode,
+            productName,
+            productPrice,
             uid,
             transactionId,
             screenshotId,
@@ -186,8 +188,8 @@ bot.on('photo', async (ctx) => {
 **অর্ডার আইডি:** ${order.orderId}
 **ইউজার আইডি:** ${order.userId}
 **ইউজার নাম:** ${order.userName}
-**প্যাকেজ:** ${order.packageName} (${order.packageCode})
-**মূল্য:** ${order.packagePrice}৳
+**প্ল্যান:** ${order.productName} (${order.productCode})
+**মূল্য:** ${order.productPrice}৳
 **UID:** ${order.uid}
 **ট্রানজেকশন আইডি:** ${order.transactionId}
 **সময়:** ${new Date(order.timestamp).toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' })}
