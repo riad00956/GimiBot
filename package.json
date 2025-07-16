@@ -1,25 +1,43 @@
 {
-  "name": "ff-diamond-bot",
-  "version": "1.0.0",
-  "description": "A Node.js Telegram bot for Free Fire Manual Diamond Top-up System.",
-  "main": "bot.js",
-  "scripts": {
-    "start": "node bot.js"
-  },
-  "keywords": [
-    "telegram",
-    "bot",
-    "nodejs",
-    "freefire",
-    "diamond",
-    "topup",
-    "render"
+  "Evo Access Package": [
+    { "code": "FX1", "name": "3 Day Evo Access", "price": 80 },
+    { "code": "FX2", "name": "7 Day Evo Access", "price": 120 },
+    { "code": "FX3", "name": "30 Day Evo Access", "price": 400 },
+    { "code": "FX4", "name": "30 Day Evo Access ×2", "price": 650 }
   ],
-  "author": "Your Name/Organization",
-  "license": "MIT",
-  "dependencies": {
-    "axios": "^1.7.2",
-    "dotenv": "^16.4.5",
-    "telegraf": "^4.16.1"
-  }
+  "Weekly Lite Package": [
+    { "code": "FX5", "name": "Weekly Lite ×1", "price": 45 },
+    { "code": "FX6", "name": "Weekly Lite ×2", "price": 90 },
+    { "code": "FX7", "name": "Weekly Lite ×3", "price": 135 },
+    { "code": "FX8", "name": "Weekly Lite ×5", "price": 225 },
+    { "code": "FX9", "name": "Weekly Lite ×10", "price": 450 }
+  ],
+  "Diamond Pack": [
+    { "code": "FX10", "name": "25💎", "price": 28 },
+    { "code": "FX11", "name": "50💎", "price": 45 },
+    { "code": "FX12", "name": "115💎", "price": 95 },
+    { "code": "FX13", "name": "240💎", "price": 185 },
+    { "code": "FX14", "name": "355💎", "price": 270 },
+    { "code": "FX15", "name": "480💎", "price": 360 },
+    { "code": "FX16", "name": "610💎", "price": 490 },
+    { "code": "FX17", "name": "725💎", "price": 595 },
+    { "code": "FX18", "name": "850💎", "price": 630 },
+    { "code": "FX19", "name": "1090💎", "price": 805 },
+    { "code": "FX20", "name": "1240💎", "price": 900 },
+    { "code": "FX21", "name": "1480💎", "price": 1120 },
+    { "code": "FX22", "name": "1720💎", "price": 1270 },
+    { "code": "FX23", "name": "1850💎", "price": 1350 },
+    { "code": "FX24", "name": "2090💎", "price": 1500 },
+    { "code": "FX25", "name": "2530💎", "price": 1690 },
+    { "code": "FX26", "name": "3140💎", "price": 2400 },
+    { "code": "FX27", "name": "3770💎", "price": 2700 },
+    { "code": "FX28", "name": "5060💎", "price": 3670 },
+    { "code": "FX29", "name": "10120💎", "price": 6900 }
+  ],
+  "অন্যান্য": [
+    { "code": "FX30", "name": "Weekly", "price": 165 },
+    { "code": "FX31", "name": "Monthly", "price": 800 },
+    { "code": "FX32", "name": "Level Up Pass", "price": 170 }
+  ]
 }
+
