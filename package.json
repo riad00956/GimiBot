@@ -1,0 +1,25 @@
+{
+  "name": "ff-diamond-bot",
+  "version": "1.0.0",
+  "description": "A Node.js Telegram bot for Free Fire Manual Diamond Top-up System.",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "nodejs",
+    "freefire",
+    "diamond",
+    "topup",
+    "render"
+  ],
+  "author": "Your Name/Organization",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "telegraf": "^4.16.1"
+  }
+}
