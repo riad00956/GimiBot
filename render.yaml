@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: ff-diamond-bot
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node bot.js
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PORT
+        value: 2229
+      - key: WEBHOOK_URL
+        sync: false
+      - key: NODE_ENV
+        value: production
+        
